@@ -17,8 +17,9 @@ find_package(PTL REQUIRED)
 add_subdirectory(common)
 
 # now the actual examples
-add_subdirectory(minimal)
-add_subdirectory(basic)
-add_subdirectory(extended)
+#add_subdirectory(minimal)
+#add_subdirectory(basic)
+#add_subdirectory(extended)
 
 # Commenting as it can not currently compile add_subdirectory(gpu)
+add_subdirectory(geant4)

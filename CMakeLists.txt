@@ -97,7 +97,7 @@ include(PTLPackageConfigHelpers)
 # -------------------------------------------------------------------------------------- #
 # Examples build/test
 if(EXISTS ${CMAKE_CURRENT_LIST_DIR}/examples)
-    ptl_add_option(PTL_BUILD_EXAMPLES "Build examples" OFF)
+    ptl_add_option(PTL_BUILD_EXAMPLES "Build examples" ON)
     if(PTL_BUILD_EXAMPLES)
         if(CMAKE_CXX_CLANG_TIDY)
             set(CMAKE_CXX_CLANG_TIDY)
