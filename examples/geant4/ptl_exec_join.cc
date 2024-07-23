@@ -34,6 +34,12 @@ main()
     // Submitting data is same as before..
     for(const auto& item : data)
     {
+        // This is fine, but note:
+        // - `count` takes argument by reference
+        // - The execution of `count` must therefore be within the lifetime
+        //   of the referee.
+        // - Fine here, because lifetime of `data` is main(), execution of
+        //   all `count` tasks happens in join right before end of main.
         group.exec(count, item);
     }
 
