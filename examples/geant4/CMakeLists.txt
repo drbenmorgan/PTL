@@ -6,15 +6,13 @@ target_link_libraries(ptl_hello PRIVATE PTL::ptl)
 add_executable(ptl_hello_task ptl_hello_task.cc)
 target_link_libraries(ptl_hello_task PRIVATE PTL::ptl)
 
+# Copy/move data
+add_executable(ptl_copy_move ptl_copy_move.cc)
+target_link_libraries(ptl_copy_move PRIVATE PTL::ptl)
+
 # Basic exec/join with TaskGroup
 add_executable(ptl_exec_join ptl_exec_join.cc)
 target_link_libraries(ptl_exec_join PRIVATE PTL::ptl)
 
 add_executable(ptl_exec_join_vector ptl_exec_join_vector.cc)
 target_link_libraries(ptl_exec_join_vector PRIVATE PTL::ptl)
-
-# Copy/move data
-add_executable(ptl_copy_move ptl_copy_move.cc)
-target_link_libraries(ptl_copy_move PRIVATE PTL::ptl)
-
-

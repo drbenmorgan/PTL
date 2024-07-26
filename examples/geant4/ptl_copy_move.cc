@@ -78,7 +78,6 @@ main()
         // Use of auto and a range-for loop doesn't help either:
         std::cout << "- Start TaskGroup::exec uses pass-by-value demo (vector): "
                   << std::endl;
-
         std::cout << "- Constructing vector..." << std::endl;
         std::vector<ExpensiveToCopy> v(2);
         std::cout << "- Starting loop" << std::endl;
@@ -102,8 +101,9 @@ main()
     }
     std::cout << std::endl;
 
-    // 2. Clarify argument as ref using C++ tool for the job:
-    // SA: https://en.cppreference.com/w/cpp/utility/functional/ref
+    // 2. Clarify argument as ref using C++ tool for the job. Basically, function/arg
+    //    binding: 
+    //    - https://en.cppreference.com/w/cpp/utility/functional/ref
     std::cout << "Start TaskGroup::exec with std::cref demo: " << std::endl;
     {
         ExpensiveToCopy      y;
@@ -113,7 +113,9 @@ main()
     }
     std::cout << std::endl;
 
-    // Passing pointers directly works as they're trivially copyable
+    // 3. Passing pointers directly works as they're trivially copyable
+    //    Similarly any "pointer view" like objects provided what they view has
+    //    a lifetime that extends until after the join.
     std::cout << "Start TaskGroup::exec with pointer demo: " << std::endl;
     {
         ExpensiveToCopy      y;
@@ -122,4 +124,21 @@ main()
         group.exec(pass_by_pointer, ptr);
         group.join();
     }
+
+    // 4. DANGER: Now that we see how to properly pass be reference, we
+    // must be careful with object lifetimes:
+    // - Execution of task is not synchronous
+    // - Potential for it to be executed *after* the lifetime of the passed 
+    //   ref/pointer has expired
+    // - Basically, the lifetime of the Task must be within the lifetime of
+    //   all data it uses.
+    //
+    // Say we do:
+    //
+    // auto p = new int(10);
+    // a_task_group.exec(something, p);
+    // delete p;
+    //
+    // This might appear to work, but the actual execution of something(p) might
+    // happen after the delete, and so try to access a dangling pointer.
 }

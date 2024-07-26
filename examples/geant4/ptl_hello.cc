@@ -35,7 +35,10 @@ main()
     // NB: Is synchronous, so will only return after all executions are joined.
     pool.execute_on_all_threads(say_hello);
 
-    // Can also pass functors
+    // Can also pass functors.
+    // NB: The same object instance is executed on all threads, but note that the
+    // interface is pass-by-value. That single instance is therefore at best a move
+    // of what's passed in, at worst a copy-move.
     pool.execute_on_all_threads(SaySomething{});
 
     // It also supports running lambdas

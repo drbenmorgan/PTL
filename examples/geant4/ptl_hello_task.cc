@@ -20,7 +20,7 @@ struct SaySomething
     void operator()(const std::string& data) const
     {
         PTL::AutoLock l(PTL::TypeMutex<decltype(std::cout)>());
-        std::cout << "Functor running with data '" << data << "' on thread "
+        std::cout << "Functor " << this << " running with data '" << data << "' on thread "
                   << PTL::GetThreadId() << std::endl;
     }
 };
@@ -28,13 +28,19 @@ struct SaySomething
 int
 main()
 {
-    // TaskGroup? What is next level above ThreadPool
-    // This uses the internal threadpool by default, but we can pass one if needed
+    // TaskGroup is next level above ThreadPool
+    // This uses the internal threadpool by default, but we can pass one 
+    // as a constructor argument if needed (see later)
+    // It also takes a template argument to indicate the return type of all
+    // calls that will be run in this group
     PTL::TaskGroup<void> group;
 
-    // This is just one Task, but it is asynchronous
+    // This is results in just one Task, but it is asynchronous (doesn't block
+    // until `say_hello` completes)...
     group.exec(say_hello);
-    // ... so it should be paired somewhere with a join
+    // ... so it should be paired somewhere with a join     
+    // Not doing so usually leads to a segfault (e.g. threads still running at program
+    // exit), or side effects (tasks/results remain in the underlying queue until join())
     group.join();
 
     // Unlike ThreadPool case, can submit variable number of executions (here, Tasks)
@@ -48,9 +54,20 @@ main()
     for(const auto& item : data)
     {
         group.exec(say_hello);
+        // Note: as before, we are passing by value here so do get copying!
+        // Even so, for future reference when we resolve this, be careful, as:
+        // - `SaySomething::operator()...` takes argument by reference
+        // - Its execution must therefore be within the lifetime
+        //   of the referee.
+        // - Fine here, because lifetime of `data` is main(), execution of
+        //   all `count` tasks happens in join right before end of main.
         group.exec(SaySomething{}, item);
     }
-    // ... as before **MUST** join at some point to ensure all Tasks have completed
-    // Not doing so usually leads to a segfault.
+
+    // Though we must always finally join(), we can also use wait() as an intermediate 
+    // synchronization point that ensures all tasks submited have completed...
+    group.wait();
+
+    // ... before join()ing somewhere else
     group.join();
 }
