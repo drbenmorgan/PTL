@@ -141,4 +141,14 @@ main()
     //
     // This might appear to work, but the actual execution of something(p) might
     // happen after the delete, and so try to access a dangling pointer.
+    //
+    // Similarly for:
+    //
+    // {
+    //   int p = 10;
+    //   a_task_group.exec(something, p);
+    // }
+    // group.join();
+    //
+    // with stack variables going out of scope.
 }
