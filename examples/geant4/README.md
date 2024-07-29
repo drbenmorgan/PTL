@@ -64,16 +64,22 @@ task only ever works on one memory location. Key points:
 - May be different ways to organise input/Task/output.
 - Thread safety can be maintained, but care needed. 
 
+## `ptl_vector_subtask.cc`
+Another take on `ptl_vector_to_vector.cc` this time showing that the function
+called in a task can itself launch other tasks to complete a subset of work.
+Only simple, totally independent tasks are considered here. Recursive tasking,
+i.e. a function that launches Tasks of itself, need care and are considered
+separately. Key points:
+
+- Tasks can launch other tasks, the global threadpool being used by default.
+- Blocks of work can be sent to tasks.
+
 ## Vector of independent objects, call void method on each one
 - Task per object, or blocked range
 - Thread local limitations, if any
 
 ## Tasks which may be independent, but which insert data in a global store
 - Mutex use
-
-## Subtasking?
-- Maybe each task will have a random number of calculations to do, launch
-  subtasks if there are "enough"?
 
 ## Use of Ranges (Optional)
 Ranges are a C++20/23 [standard library](https://en.cppreference.com/w/cpp/ranges), also
@@ -85,7 +91,10 @@ We illustrate them here despite this limitation as they are extremely useful
 for implementing Task-related operations.
 
 ### Enumerations
+- When we want to use range-for, but know how far we are from the start
 
 ### Zips
+- When we want to iterate over two or more ranges together
 
 ### Chunks
+- When we want to split range up into blocks to work on
