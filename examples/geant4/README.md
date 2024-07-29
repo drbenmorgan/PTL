@@ -54,14 +54,19 @@ can have a different type from the result type of the Tasks. Key points:
 - Join function for differing result/join types.
 - Simple N->N join operation.
 
+## `ptl_vector_to_vector.cc`
+A slightly different way to organise the computation in `ptl_exec_join_vector.cc`.
+We realize that we are doing a N->N mapping with each element independent. So
+instead of "joining" results into a final vector, can also pre-allocate result
+vector, then each task computes and sets each element. Thread-safe here as each
+task only ever works on one memory location. Key points:
+
+- May be different ways to organise input/Task/output.
+- Thread safety can be maintained, but care needed. 
+
 ## Vector of independent objects, call void method on each one
 - Task per object, or blocked range
 - Thread local limitations, if any
-
-## Vector of independent objects, generate vector of new objects
-- Task per object with join, supply presized data
-- Check thread safety here!!
-- Thread local limitations if any
 
 ## Tasks which may be independent, but which insert data in a global store
 - Mutex use
@@ -70,3 +75,17 @@ can have a different type from the result type of the Tasks. Key points:
 - Maybe each task will have a random number of calculations to do, launch
   subtasks if there are "enough"?
 
+## Use of Ranges (Optional)
+Ranges are a C++20/23 [standard library](https://en.cppreference.com/w/cpp/ranges), also
+available for earlier standards in the [`ranges-v3` library](https://github.com/ericniebler/range-v3)
+which the C++ Standard adopted. These are usable in Geant4 given its use of C++17, but
+use here would require import on `ranges-v3` as an external.
+
+We illustrate them here despite this limitation as they are extremely useful
+for implementing Task-related operations.
+
+### Enumerations
+
+### Zips
+
+### Chunks

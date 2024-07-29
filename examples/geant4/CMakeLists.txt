@@ -16,3 +16,6 @@ target_link_libraries(ptl_exec_join PRIVATE PTL::ptl)
 
 add_executable(ptl_exec_join_vector ptl_exec_join_vector.cc)
 target_link_libraries(ptl_exec_join_vector PRIVATE PTL::ptl)
+
+add_executable(ptl_vector_to_vector ptl_vector_to_vector.cc)
+target_link_libraries(ptl_vector_to_vector PRIVATE PTL::ptl)
