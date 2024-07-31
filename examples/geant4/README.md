@@ -87,14 +87,14 @@ available for earlier standards in the [`ranges-v3` library](https://github.com/
 which the C++ Standard adopted. These are usable in Geant4 given its use of C++17, but
 use here would require import on `ranges-v3` as an external.
 
-We illustrate them here despite this limitation as they are extremely useful
+TODO: May illustrate them here despite this limitation as they are extremely useful
 for implementing Task-related operations.
 
 ### Enumerations
 - When we want to use range-for, but know how far we are from the start
 
 ### Zips
-- When we want to iterate over two or more ranges together
+- When we want to iterate over two or more ranges together in sync
 
 ### Chunks
 - When we want to split range up into blocks to work on
