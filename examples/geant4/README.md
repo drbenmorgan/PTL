@@ -14,7 +14,8 @@ Demonstrates basic use of PTL's low level `ThreadPool` class. The primary
 case shown is how the same thing (free function, Functor, or lambda) can be executed 
 on all threads. Key points:
 
-- Only for operations that must be executed on every single thread in the pool.
+- Only for operations that must be executed on every single thread in the pool, such as
+  those that rely on `thread_local` variables.
 - Operations are synchronous, or rather, `execute_on_all_threads` blocks until
   all threads have completed their work.
 - No direct way to pass different data to each thread, or get results back (and 
@@ -25,6 +26,7 @@ Demonstrates basic use of PTL's `TaskGroup` class to do the same operations
 we did in `ptl_hello.cc`. Key points:
 
 - Asynchronous submission of work, Tasks, that may or may not run on any given thread in the pool.
+- Tasks are not guaranteed to run on a specific thread.
 - Tasks as free functions, lambdas, or Functors.
 - Submission of different data with each Task.
 - Synchronization in thread where Tasks submitted from.
