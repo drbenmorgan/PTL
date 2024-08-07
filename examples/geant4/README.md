@@ -9,7 +9,7 @@ in the interfaces/behaviour.
 Short summaries are listed below, with detailed technical parts covered by
 comments in the source code.
 
-## `ptl_hello.cc`
+## [`ptl_hello.cc`](./ptl_hello.cc)
 Demonstrates basic use of PTL's low level `ThreadPool` class. The primary
 case shown is how the same thing (free function, Functor, or lambda) can be executed 
 on all threads. Key points:
