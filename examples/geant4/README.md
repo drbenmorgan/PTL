@@ -9,6 +9,29 @@ in the interfaces/behaviour.
 Short summaries are listed below, with detailed technical parts covered by
 comments in the source code.
 
+## Quickstart
+PTL's build is very simple, only requiring a C++17 compliant compiler and CMake 3.8
+or newer. For these examples, all that should be needed to change into the top level
+PTL directory and run
+
+```console
+$ cmake -S. -Bbuild
+$ cmake --build ./build
+```
+
+You can then change into the `build` directory, and all of the examples below will have
+been built in place and can be run directly. All other ways of configuring/building with
+CMake are of course supported. The default build options should be sufficient to work through
+these exercises, but some useful ones you may want to explore are:
+
+- `-DPTL_USE_LOCKS=ON`
+  - This adds additional internal mutex locking in PTL which can be useful to confirm
+    thread safety of the below using sanitizers
+- `-DPTL_USE_SANITIZER=ON -DPTL_SANTIZER_TYPE=thread`
+  - Enables use of thread santization in PTL and examples. Useful if you want to confirm
+    thread safety or identify issues.
+
+
 ## [`ptl_hello.cc`](./ptl_hello.cc)
 Demonstrates basic use of PTL's low level `ThreadPool` class. The primary
 case shown is how the same thing (free function, Functor, or lambda) can be executed 
@@ -21,7 +44,7 @@ on all threads. Key points:
 - No direct way to pass different data to each thread, or get results back (and 
   see later on copy/move semantics).
 
-## `ptl_hello_task.cc`
+## [`ptl_hello_task.cc`](./ptl_hello_task.cc)
 Demonstrates basic use of PTL's `TaskGroup` class to do the same operations
 we did in `ptl_hello.cc`. Key points:
 
@@ -31,7 +54,7 @@ we did in `ptl_hello.cc`. Key points:
 - Submission of different data with each Task.
 - Synchronization in thread where Tasks submitted from.
 
-## `ptl_copy_move.cc`
+## [`ptl_copy_move.cc`](./ptl_copy_move.cc)
 Simple but important demonstration of the copy-move semantics of passing
 arguments to `TaskGroup::exec` and similar (`ThreadPool::execute_on_all_threads`).
 Key points:
@@ -41,7 +64,7 @@ Key points:
 - Need to be aware of possible differences in data/execution lifetimes to avoid
   issues like dangling pointers.
 
-## `ptl_exec_join.cc`
+## [`ptl_exec_join.cc`](./ptl_exec_join.cc)
 Builds on previous examples to show how `TaskGroup::join` can be used to collect
 non-void return values from submitted Tasks. Key points:
 
@@ -49,14 +72,14 @@ non-void return values from submitted Tasks. Key points:
 - Simple N->1 join operation.
 - That join operation is sequential over the Task results in the TaskGroup's thread.
 
-## `ptl_exec_join_vector.cc`
+## [`ptl_exec_join_vector.cc`](./ptl_exec_join_vector.cc)
 The same as `ptl_exec_join.cc` but demonstrating that the join operation
 can have a different type from the result type of the Tasks. Key points:
 
 - Join function for differing result/join types.
 - Simple N->N join operation.
 
-## `ptl_vector_to_vector.cc`
+## [`ptl_vector_to_vector.cc`](./ptl_vector_to_vector.cc)
 A slightly different way to organise the computation in `ptl_exec_join_vector.cc`.
 We realize that we are doing a N->N mapping with each element independent. So
 instead of "joining" results into a final vector, can also pre-allocate result
@@ -66,7 +89,7 @@ task only ever works on one memory location. Key points:
 - May be different ways to organise input/Task/output.
 - Thread safety can be maintained, but care needed. 
 
-## `ptl_vector_subtask.cc`
+## [`ptl_vector_subtask.cc`](./ptl_vector_subtask.cc)
 Another take on `ptl_vector_to_vector.cc` this time showing that the function
 called in a task can itself launch other tasks to complete a subset of work.
 Only simple, totally independent tasks are considered here. Recursive tasking,
@@ -76,7 +99,7 @@ separately. Key points:
 - Tasks can launch other tasks, the global threadpool being used by default.
 - Blocks of work can be sent to tasks.
 
-## `ptl_exec_member_function.cc`
+## [`ptl_exec_member_function.cc`](./ptl_exec_member_function.cc)
 Demonstrates that we can also call member functions on existing object instances,
 the easiest way being through lambdas. Though not shown for clarity, how to pass
 data to the member function calls can also be handled through lambda captures and
