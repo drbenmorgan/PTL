@@ -7,7 +7,7 @@ include(CheckCXXCompilerFlag)
 # Build Type(s)
 #
 # -------------------------------------------------------------------------------------- #
-set(__ptl_default_build_type "Release")
+set(__ptl_default_build_type "RelWithDebInfo")
 
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     message(
@@ -77,11 +77,11 @@ endif()
 # -------------------------------------------------------------------------------------- #
 if(WIN32)
     set(CMAKE_CXX_STANDARD
-        14
+        17
         CACHE STRING "C++ STL standard")
 else()
     set(CMAKE_CXX_STANDARD
-        11
+        17
         CACHE STRING "C++ STL standard")
 endif()
 ptl_message_on_change(CMAKE_CXX_STANDARD "Building PTL with CMAKE_CXX_STANDARD")
