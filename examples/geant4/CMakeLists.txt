@@ -17,8 +17,14 @@ target_link_libraries(ptl_exec_join PRIVATE PTL::ptl)
 add_executable(ptl_exec_join_vector ptl_exec_join_vector.cc)
 target_link_libraries(ptl_exec_join_vector PRIVATE PTL::ptl)
 
+# Other ways of structuring computation
 add_executable(ptl_vector_to_vector ptl_vector_to_vector.cc)
 target_link_libraries(ptl_vector_to_vector PRIVATE PTL::ptl)
 
 add_executable(ptl_vector_subtask ptl_vector_subtask.cc)
 target_link_libraries(ptl_vector_subtask PRIVATE PTL::ptl)
+
+# Handling vectors of objects
+add_executable(ptl_exec_member_function ptl_exec_member_function.cc)
+target_link_libraries(ptl_exec_member_function PRIVATE PTL::ptl)
+

@@ -3,7 +3,7 @@
 The examples here are intended as a simple step-by-step buildup through
 the capabilities on PTL useful withing scope of Geant4's workitem on
 parallelizing its initialization stage. They are deliberately minimal
-and less convoluted that PTLs examples, additional showing some gotchas
+and less convoluted than PTLs examples, additionally showing some gotchas
 in the interfaces/behaviour.
 
 Short summaries are listed below, with detailed technical parts covered by
@@ -76,14 +76,29 @@ separately. Key points:
 - Tasks can launch other tasks, the global threadpool being used by default.
 - Blocks of work can be sent to tasks.
 
-## Vector of independent objects, call void method on each one
-- Task per object, or blocked range
-- Thread local limitations, if any
+## `ptl_exec_member_function.cc`
+Demonstrates that we can also call member functions on existing object instances,
+the easiest way being through lambdas. Though not shown for clarity, how to pass
+data to the member function calls can also be handled through lambda captures and
+the techniques shown in previous exercises. It is left as an exercise if you are
+interested. Key points:
 
-## Tasks which may be independent, but which insert data in a global store
-- Mutex use
+- Wrapping of member function calls on objects through lambdas.
+- Can call more than one member function in Task if required, or easiest for
+  efficient computation.
 
-## Use of Ranges (Optional)
+## Handling `thread_local` data and Tasks that insert data in a global store
+Tasking works best with computations that don't rely on `thread_local` data
+as there is no guarantee of tasks running on all threads (see use of
+`ThreadPool::execute_on_all_threads` in `ptl_hello.cc` if that is required).
+
+Similarly, tasks that may insert data in a global store, or otherwise perform
+non-threadsafe operations on shared data require careful use of locking or similar.
+These are left as a semi-obvious exercise, or to be shown as use-cases in Geant4
+are identified
+
+
+## Use of Ranges (TODO/Optional)
 Ranges are a C++20/23 [standard library](https://en.cppreference.com/w/cpp/ranges), also
 available for earlier standards in the [`ranges-v3` library](https://github.com/ericniebler/range-v3)
 which the C++ Standard adopted. These are usable in Geant4 given its use of C++17, but
@@ -93,10 +108,66 @@ TODO: May illustrate them here despite this limitation as they are extremely use
 for implementing Task-related operations.
 
 ### Enumerations
-- When we want to use range-for, but know how far we are from the start
+For when we want to use range-for, but know how far we are from the start, e.g.
+
+```c++
+#include <iostream>
+#include <vector>
+
+#include <range/v3/view/enumerate.hpp>
+
+int main()
+{
+    constexpr static auto v = {'A', 'B', 'C', 'D'};
+
+    for (auto const [index, letter] : ranges::views::enumerate(v))
+        std::cout << index << ':' << letter << std::endl;
+
+    // Outputs 0:A 1:B etc...
+}
+```
 
 ### Zips
-- When we want to iterate over two or more ranges together in sync
+For when we want to iterate over two or more ranges together in sync, e.g.
+
+```c++
+#include <iostream>
+#include <vector>
+
+#include <range/v3/view/enumerate.hpp>
+ 
+int main()
+{
+    constexpr static auto latin = {'a', 'b', 'c', 'd'};
+    constexpr static auto greek = {"α", "β", "γ", "δ"};
+    for (auto const& [l, g] : ranges::views::zip(latin, greek))
+        std::cout << l << ':' << g << std::endl;
+
+    // Outputs a:α etc... 
+}
+```
 
 ### Chunks
-- When we want to split range up into blocks to work on
+For when we want to split range up into blocks to work on, e.g.
+
+```c++
+#include <algorithm>
+#include <iostream>
+
+#include <range/v3/view/chunk.hpp>
+ 
+int main()
+{
+    const auto v = {1, 2, 3, 4, 5, 6, 7};
+ 
+    for (const auto& chunk : ranges::views::chunk(v, 2))
+    {
+      std::cout << "[ ";
+      for (const auto i : chunk)
+        std::cout << i << ", ";
+      std::cout << "]" << std::endl;
+    }
+
+    // outputs [ 1, 2, ] [3, 4, ] etc
+}
+```
