@@ -28,3 +28,12 @@ target_link_libraries(ptl_vector_subtask PRIVATE PTL::ptl)
 add_executable(ptl_exec_member_function ptl_exec_member_function.cc)
 target_link_libraries(ptl_exec_member_function PRIVATE PTL::ptl)
 
+# Raw Tasks with ThreadPool
+add_executable(ptl_raw_task ptl_raw_task.cc)
+target_link_libraries(ptl_raw_task PRIVATE PTL::ptl)
+
+# Raw Tasks with TaskManager
+add_executable(ptl_raw_taskmanager ptl_raw_taskmanager.cc)
+target_link_libraries(ptl_raw_taskmanager PRIVATE PTL::ptl)
+
+

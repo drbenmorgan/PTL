@@ -120,8 +120,54 @@ non-threadsafe operations on shared data require careful use of locking or simil
 These are left as a semi-obvious exercise, or to be shown as use-cases in Geant4
 are identified
 
+## Managing the Components at Lower Level
+
+The preceeding examples show the primary and most critical patterns of PTL use in Geant4:
+
+- `PTL::ThreadPool::execute_on_all_threads` to ensure static/thread_local data is initialized
+  on all worker threads that _might_ execute Run/Event tasks.
+- `PTL::TaskGroup` (taking no arguments, returning `void`) to `exec` the run/event work.
+
+There are some communication aspects between the Tasks and the main thread to ensure reproducibility
+(essentially random number seed to event number mapping(?)), but these are left to later.
+The other major item is the use of `PTL::TaskRunManager` and `PTL::TaskManager`, though
+it must be noted that these are essentially _utilities_.
+
+All `PTL::TaskManager` does is hold a `PTL::ThreadPool` instance and provide `async` helper
+functions. These take a callable and its arguments, put these into a `Task` `shared_ptr`, and submit
+this to the held `ThreadPool` before returning the shared pointer to the Task. It does
+provide a thread local singleton interface, but this appears to be unused. It also picks up
+the global thread pool from the `PTL::TaskRunManager`.
+
+`PTL::TaskRunManager` is even more basic, simply constructing a `PTL::ThreadPool` and a `PTL::TaskManager`
+from this. There are interfaces to access these instances. There is also a singleton interface,
+but this is fully global.
+
+In fact, all of the above can be accomplished through the `PTL::ThreadPool` and/or `PTL::TaskGroup` 
+interfaces alone. Nevertheless, it's useful to show a quick demo of the lower level tasks
+of directly creating, submitting, and waiting on tasks compared to the task group examples.
+
+
+### [`ptl_raw_task.cc`](./ptl_raw_task.cc)
+
+"Raw" form of `ptl_hello_task.cc` that demonstates the lower level operations of
+direct `Task` creation, submission to `ThreadPool`, and `wait/get` of results.
+Key points:
+
+- Functors/etc are wrapped into `PTL::PackagedTask` objects, which are future-promise based.
+- More verbose code needed compared to `TaskGroup` implementation, as types need to be
+  specified.
+
+### [`ptl_raw_taskmanager.cc`](./ptl_raw_taskmanager.cc)
+
+"Helper" form of `ptl_raw_task.cc` that shows the `async` helper functions of `PTL::TaskManager`.
+Key points:
+
+- Easier creation of tasks using the `async` helpers to assist type deduction
+- Slightly awkward creation and management of `PTL::ThreadPool` and `PTL::TaskManager`.
 
 ## Use of Ranges (TODO/Optional)
+
 Ranges are a C++20/23 [standard library](https://en.cppreference.com/w/cpp/ranges), also
 available for earlier standards in the [`ranges-v3` library](https://github.com/ericniebler/range-v3)
 which the C++ Standard adopted. These are usable in Geant4 given its use of C++17, but
@@ -131,6 +177,7 @@ TODO: May illustrate them here despite this limitation as they are extremely use
 for implementing Task-related operations.
 
 ### Enumerations
+
 For when we want to use range-for, but know how far we are from the start, e.g.
 
 ```c++
